@@ -9,23 +9,34 @@ int main(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	// Enable Peripheral Clocks
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-	// Configure Pins
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOA, ENABLE);
+	// Configure LEDs: PC9 (green), PC8 (blue)
 	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_8;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	// Configure user button
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
 	// Configure SysTick Timer
 	if (SysTick_Config(SystemCoreClock / 1000))
 		while (1);
 	//
 	while (1) {
 		static int ledval = 0;
+		static int btnval = 0;
 
-		// toggle led
+		// toggle green led
 		GPIO_WriteBit(GPIOC, GPIO_Pin_9, (ledval) ? Bit_SET : Bit_RESET);
 		ledval = 1 - ledval;
+		// set blue led with user button
+		btnval = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0);
+		GPIO_WriteBit(GPIOC, GPIO_Pin_8, (btnval) ? Bit_SET : Bit_RESET);
+
 		Delay(250);	// wait 250 ms
 	}
 
