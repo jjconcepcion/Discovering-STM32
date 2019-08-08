@@ -50,8 +50,15 @@ int uart_close(USART_TypeDef *USARTx)
 {
 }
 
+/* @brief Performs busy-wait on USART data register to transmit a character
+ */
 int uart_putc(int c, USART_TypeDef *USARTx)
 {
+	assert_param(IS_USART_123_PERIPH(USARTx));
+
+	while (USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET);
+	USARTx->DR = (c & 0xff);
+	return 0;
 }
 
 int uart_getc(USART_TypeDef *USARTx)
