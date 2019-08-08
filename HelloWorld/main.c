@@ -5,12 +5,23 @@
 void Delay(uint32_t nTime);
 
 int main(void) {
+	static const uint32_t baud = 9600;
+	static const uint32_t flags = 0;
+	static const char message[] = "Hello World!\n\r";
+	static uint8_t i;
+
+	// Configure the UART	
+	uart_open(USART1, baud, flags);
+
 	// Configure SysTick Timer
 	if (SysTick_Config(SystemCoreClock / 1000))
 		while (1);
 
 	while (1) {
-
+		// transmit hello world message
+		for (i = 0; message[i]; i++)
+			uart_putc(message[i], USART1);
+				
 		Delay(250);	// wait 250 ms
 	}
 	
