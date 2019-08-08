@@ -46,8 +46,12 @@ int uart_open(USART_TypeDef *USARTx, uint32_t baud, uint32_t flags)
 	return 0;
 }
 
+/* @brief Deinitialize USARTx peripheral
+ */
 int uart_close(USART_TypeDef *USARTx)
 {
+	assert_param(IS_USART_123_PERIPH(USARTx));
+	USART_DeInit(USARTx);
 }
 
 /* @brief Performs busy-wait on USART data register to transmit a character
